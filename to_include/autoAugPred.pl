@@ -47,7 +47,7 @@ my $clusterENVDefs = "export SGE_ROOT=/opt/sge";  # commands to define environme
 my $SGEqstatPath = "/opt/sge/bin/lx24-amd64/";    # path to executables on Sun Grid Engine (qsub, qstat)
 my $verbose=2;           # verbose level
 my $singleCPU=0;         # run sequentially on a single CPU
-my $threads=0;
+my $threads=1;
 my $nodeNum=20;          # node number in your cluster
 my $user_config_path;    # AUGUSTUS_CONFIG_PATH if specified on the command line
 my $AUGUSTUS_CONFIG_PATH;# command line path, or environment variable, if not specified.
@@ -161,7 +161,7 @@ if($noninteractive){
 } else { # interactive
     if (@dopreds){
 	if ($singleCPU){
-	    if (!$threads){
+	    if ($threads == 1){
 		    print "1 running augustus jobs aug" . join(" aug", @dopreds) . " sequentially now\n" if ($verbose >= 1);
 		    chdir "$workDir/shells/";
 		    for (my $i=1; $i <= $splitN; $i++){

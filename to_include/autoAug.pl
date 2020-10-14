@@ -42,7 +42,7 @@ my $pasapolyAhints;                   # use pasa Poly A hints as hints for the p
 my $fasta_cdna;                       # fasta file for PASA
 my $verbose=2;                        # verbose level
 my $singleCPU=0;                      # run everything sequentially whithout interruption
-my $threads=0;
+my $threads=1;
 my $maxIntronLen = 100000;            # maximal length of an intron, used by PASA and BLAT
 my $noninteractive;                   # parameter for autoAugPred.pl
 my $cname="fe";                       # parameter for autoAugPred.pl:cluster name
@@ -790,7 +790,7 @@ sub autoAug_prepareScripts{
     $perlCmdString = "perl $scriptPath/autoAugPred.pl -g=$genome_clean --species=$species -w=$rootDir $utrString " . 
 	"$verboseString $hintsString $useexistingopt";
     $perlCmdString .= " --singleCPU" if ($singleCPU);
-    $perlCmdString .= " --threads $threads" if ($threads);
+    $perlCmdString .= " --threads $threads" if ($threads > 1);
     print "2 $perlCmdString" if ($verbose>=2);
     system("$perlCmdString")==0 or die("\nfailed to execute $!\n");
     
@@ -849,7 +849,7 @@ sub autoAug_continue{
 
     $perlCmdString = "perl $scriptPath/autoAugPred.pl --species=$species --genome=$rootDir/seq/genome_clean.fa --continue --workingdir=$rootDir $verboseString $hintsString $utrString $useexistingopt";
     $perlCmdString .= " --singleCPU" if ($singleCPU);
-    $perlCmdString .= " --threads $threads" if ($threads);
+    $perlCmdString .= " --threads $threads" if ($threads > 1);
     my $abortString = "\nError executing\n$perlCmdString\n";
     print "3 $perlCmdString\n" if ($verbose >= 3);
     chdir $positionWD;
