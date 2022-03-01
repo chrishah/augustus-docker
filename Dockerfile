@@ -13,6 +13,7 @@ ENV AUGUSTUS_CONFIG_PATH /usr/share/augustus/config
 ENV PATH="/usr/share/augustus/scripts:${PATH}"
 
 #replace autoAugTrain.pl script with version that fixes a bug when training Augustus with UTR 
+#replace autoAugTrain.pl script with version that allows to run optimize_augustus.pl in parallel
 #replace autoAugPred.pl script with custom version that is parallelized (some steps) via GNU parallel
 #both the scripts were modified from the versions shipping with Ubuntu 18.04
 ADD to_include/autoAugTrain.pl to_include/autoAugPred.pl to_include/autoAug.pl /usr/share/augustus/scripts/
@@ -26,12 +27,14 @@ RUN sed -i 's?augpath = ".*?augpath = "/usr/bin/augustus";?' /usr/share/augustus
 #DBI perl module is necessary for autoAug
 ENV PERL_MM_USE_DEFAULT=1
 RUN cpan DBI && \
-	cpan YAML
-#set up minimal bioperl
-RUN wget https://github.com/bioperl/bioperl-live/archive/release-1-7-2.tar.gz && \
-	tar xvfz release-1-7-2.tar.gz && \
-	rm release-1-7-2.tar.gz
-ENV PERL5LIB="/usr/src/bioperl-live-release-1-7-2"
+	cpan YAML && \
+	cpan Parallel::ForkManager && \
+	cpan BioPerl
+##set up minimal bioperl
+#RUN wget https://github.com/bioperl/bioperl-live/archive/release-1-7-2.tar.gz && \
+#	tar xvfz release-1-7-2.tar.gz && \
+#	rm release-1-7-2.tar.gz
+#ENV PERL5LIB="/usr/src/bioperl-live-release-1-7-2"
 
 #set up scipio
 ADD to_include/scipio-1.4.zip /usr/src/

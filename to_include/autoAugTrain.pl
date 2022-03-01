@@ -39,6 +39,7 @@ my $positionWD = $cwd;     # position where working directory placed, default: c
 my $workDir;               # working directory = $positionWD/autoAugTrain
 my $aug;                   # prediction file made by AUGUSTUS
 my $estali;                # est file to train untranslated region
+my $threads=1;
 my $verbose=0;             # verbose level
 my $CRFtrain=0;            # try CRF training in addition to normal HMM training
 my $optrounds=1;           # optimization rounds
@@ -91,6 +92,7 @@ GetOptions('genome=s' => \$genome,
 	   'estali=s' => \$estali,
 	   'verbose+' => \$verbose,
 	   'optrounds=i' => \$optrounds,
+	   'threads=i'=> \$threads,
 	   'useexisting!' => \$useexisting
 	   );
 if ($flanking_DNA > 10000){
@@ -369,6 +371,9 @@ sub train{
 		   "$configDir/$metaName"], ["$workDir/training/optimize.out", "$configDir/$paraName"])){
 	chdir "$workDir/training/" or die ("Can not chdir to $workDir/training/.\n");
 	$string=find("optimize_augustus.pl");
+	if ($threads >= 1){
+		$string.=" --cpus=$threads"
+	}
 	if($t_b_o==0){
 	    $cmdString="perl $string --rounds=$optrounds --species=$species $workDir/training/training.gb.train.test --metapars=$configDir/$metaName > optimize.out";
 	} else{
