@@ -12,12 +12,6 @@ ENV AUGUSTUS_CONFIG_PATH /usr/share/augustus/config
 #Add Augustus scripts directory to PATH
 ENV PATH="/usr/share/augustus/scripts:${PATH}"
 
-#replace autoAugTrain.pl script with version that fixes a bug when training Augustus with UTR 
-#replace autoAugTrain.pl script with version that allows to run optimize_augustus.pl in parallel
-#replace autoAugPred.pl script with custom version that is parallelized (some steps) via GNU parallel
-#both the scripts were modified from the versions shipping with Ubuntu 18.04
-ADD to_include/autoAugTrain.pl to_include/autoAugPred.pl to_include/autoAug.pl /usr/share/augustus/scripts/
-
 #fix path to augustus in scripts and remove check regarding scipio.pl abort in the autoAug pipeline
 RUN sed -i 's?augpath = ".*?augpath = "/usr/bin/augustus";?' /usr/share/augustus/scripts/autoAug.pl && \
 	sed -i 's/==0 or die("Program aborted. Possibly.*/;/' /usr/share/augustus/scripts/autoAugTrain.pl && \
@@ -36,17 +30,23 @@ RUN cpan DBI && \
 #	rm release-1-7-2.tar.gz
 #ENV PERL5LIB="/usr/src/bioperl-live-release-1-7-2"
 
+#Download blat and pslcdnafilter
+RUN wget -O /usr/bin/blat http://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64.v385/blat/blat && \
+	chmod a+x /usr/bin/blat && \
+	wget -O /usr/bin/pslCDnaFilter http://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64.v385/pslCDnaFilter && \ 
+	chmod a+x /usr/bin/pslCDnaFilter
+
 #set up scipio
 ADD to_include/scipio-1.4.zip /usr/src/
 RUN unzip scipio-1.4.zip && \
 	ln -s $(pwd)/scipio-1.4/*.pl /usr/bin && \
 	ln -s $(pwd)/scipio-1.4/scipio.1.4.1.pl /usr/bin/scipio.pl
 
-#Download blat and pslcdnafilter
-RUN wget -O /usr/bin/blat http://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64.v385/blat/blat && \
-	chmod a+x /usr/bin/blat && \
-	wget -O /usr/bin/pslCDnaFilter http://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64.v385/pslCDnaFilter && \ 
-	chmod a+x /usr/bin/pslCDnaFilter
+#replace autoAugTrain.pl script with version that fixes a bug when training Augustus with UTR 
+#replace autoAugTrain.pl script with version that allows to run optimize_augustus.pl in parallel
+#replace autoAugPred.pl script with custom version that is parallelized (some steps) via GNU parallel
+#both the scripts were modified from the versions shipping with Ubuntu 18.04
+ADD to_include/autoAugTrain.pl to_include/autoAugPred.pl to_include/autoAug.pl /usr/share/augustus/scripts/
 
 #add user (not really necessary)
 RUN adduser --disabled-password --gecos '' augustus
