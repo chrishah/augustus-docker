@@ -372,7 +372,11 @@ sub train{
 	chdir "$workDir/training/" or die ("Can not chdir to $workDir/training/.\n");
 	$string=find("optimize_augustus.pl");
 	if ($threads >= 1){
-		$string.=" --cpus=$threads"
+    		if ($threads > 8){ 
+			$string.=" --cpus=$threads --kfold=$threads" 
+		}else{
+			$string.=" --cpus=$threads"
+		}
 	}
 	if($t_b_o==0){
 	    $cmdString="perl $string --rounds=$optrounds --species=$species $workDir/training/training.gb.train.test --metapars=$configDir/$metaName > optimize.out";
@@ -708,6 +712,13 @@ sub trainWithUTR{
     # start optimization script
     if (!uptodate(["train.gb", "onlytrain.gb"], ["optimize.utr.out"])){
 	$string=find("optimize_augustus.pl");
+	if ($threads >= 1){
+    		if ($threads > 8){ 
+			$string.=" --cpus=$threads --kfold=$threads" 
+		}else{
+			$string.=" --cpus=$threads"
+		}
+	}
 	print "3 Found script $string.\n" if ($verbose>=3);
 	$perlCmdString="perl $string --rounds=$optrounds --species=$species --trainOnlyUtr=1 --onlytrain=onlytrain.gb  --metapars=$configDir/$metaUtrName train.gb --UTR=on > optimize.utr.out";
 	print "1 Now optimizing meta parameters of AUGUSTUS for the UTR model." .
