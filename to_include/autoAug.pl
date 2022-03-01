@@ -752,7 +752,7 @@ sub autoTrain_no_utr{
     $trainingset   =   checkFile($trainingset, "training", $usage);
 
     # run autoAugTrain.pl
-    $perlCmdString="perl $scriptPath/autoAugTrain.pl --threads=$threads -t=$trainingset -s=$species $useexistingopt -g=$genome_clean -w=$rootDir $verboseString --opt=$optrounds";
+    $perlCmdString="perl $scriptPath/autoAugTrain.pl --threads=$threads --trainingset=$trainingset -s=$species $useexistingopt -g=$genome_clean -w=$rootDir $verboseString --opt=$optrounds";
     print "\n2 $perlCmdString\n" if ($verbose>=2);
     system("$perlCmdString")==0 or die ("failed to execute: $!\n");
 
