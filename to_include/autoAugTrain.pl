@@ -218,7 +218,7 @@ sub train{
     
     # run new_species to create the parameter files necessary for training AUGUSTUS for a new species
     $string = find("new_species.pl");
-    $perlCmdString = "perl $string --species=$species --silent ";
+    $perlCmdString = "perl $string --species=$species ";
     $perlCmdString .= "--ignore " if ($useexisting);
     $perlCmdString .= "1>new_species.stdout";
     print "2 Running command  \"$perlCmdString\" to create AUGUSTUS config files for new species $species\n" if ($verbose>=2);
